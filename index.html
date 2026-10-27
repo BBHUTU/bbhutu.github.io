@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 落地实例集 · 作品集总览</title>
+  <meta name="description" content="四个独立作品集，共 18 个已落地实例：跨境投放自动化、市场洞察报告、演讲练习工具、个人效率系统 —— 全部跑在日常工作里，不是演示 demo" />
+  <style>
+    :root {
+      --bg: #030712;
+      --bg-card: rgba(17, 24, 39, 0.7);
+      --border: rgba(56, 189, 248, 0.2);
+      --cyan: #22d3ee;
+      --blue: #3b82f6;
+      --violet: #8b5cf6;
+      --green: #10b981;
+      --amber: #fbbf24;
+      --text: #f3f4f6;
+      --text-dim: #94a3b8;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(34, 211, 238, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle at 50% 0%, black, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at 50% 0%, black, transparent 80%);
+      z-index: -2; pointer-events: none;
+    }
+    .bg-glow {
+      position: fixed; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.16), transparent 60%);
+      top: -200px; left: 50%; transform: translateX(-50%);
+      z-index: -1; filter: blur(60px); pointer-events: none;
+    }
+
+    .container { max-width: 1180px; margin: 0 auto; padding: 0 32px 80px; }
+
+    header { text-align: center; padding: 88px 20px 44px; }
+    header h1 {
+      font-size: 46px; font-weight: 800; margin: 0 0 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue), var(--violet));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+      letter-spacing: -1px;
+    }
+    header p {
+      font-size: 18px; color: var(--text-dim); margin: 0 auto; max-width: 780px;
+    }
+    header .sub2 { font-size: 14.5px; color: #64748b; margin-top: 12px; }
+
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 16px; margin: 0 0 56px;
+    }
+    .stat {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 20px; text-align: center;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .stat b { display: block; font-size: 28px; font-weight: 800; color: var(--cyan); letter-spacing: -0.5px; }
+    .stat span { font-size: 12.5px; color: var(--text-dim); }
+
+    .sites { display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px; }
+    @media (max-width: 900px) { .sites { grid-template-columns: 1fr; } }
+
+    .site {
+      display: flex; flex-direction: column;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 30px 32px 26px;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      position: relative; overflow: hidden;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .site:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 56px rgba(139, 92, 246, 0.16);
+      border-color: rgba(139, 92, 246, 0.42);
+    }
+    .site::after {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--cyan), var(--violet)); opacity: .7;
+    }
+
+    .site-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .num {
+      width: 46px; height: 46px; border-radius: 12px; flex-shrink: 0;
+      display: grid; place-items: center; font-size: 19px; font-weight: 800; color: #c4b5fd;
+      background: rgba(139, 92, 246, .12); border: 1px solid rgba(139, 92, 246, .35);
+    }
+    .site h2 { margin: 0; font-size: 22px; font-weight: 800; }
+    .site .desc { margin: 6px 0 16px; font-size: 14.5px; color: var(--text-dim); }
+    .site .why {
+      font-size: 14px; color: var(--text-dim); margin: 0 0 16px;
+      padding: 12px 16px; border-radius: 12px;
+      background: rgba(16, 185, 129, .07); border: 1px solid rgba(16, 185, 129, .26);
+      border-left: 3px solid var(--green);
+    }
+    .site .why b { color: var(--green); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 18px; }
+    .chip {
+      font-size: 13px; padding: 6px 13px; border-radius: 999px;
+      background: rgba(34, 211, 238, .08); border: 1px solid rgba(34, 211, 238, .25);
+      color: #bae6fd;
+    }
+    .chip.extra { background: rgba(251, 191, 36, .08); border-color: rgba(251, 191, 36, .28); color: #fde68a; }
+
+    .go {
+      margin-top: auto; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 22px; border-radius: 12px; font-size: 15px; font-weight: 700;
+      color: var(--text); text-decoration: none;
+      background: linear-gradient(135deg, rgba(34,211,238,.16), rgba(139,92,246,.18));
+      border: 1px solid rgba(34, 211, 238, .35);
+      transition: all .25s ease;
+    }
+    .go:hover { box-shadow: 0 0 22px rgba(34,211,238,.28); border-color: var(--cyan); }
+    .go small { font-weight: 500; color: var(--text-dim); font-size: 12.5px; }
+
+    .note-line { margin-top: 10px; font-size: 13px; color: #64748b; }
+
+    h3.section-title {
+      font-size: 24px; font-weight: 800; text-align: center; margin: 72px 0 8px; letter-spacing: -.5px;
+    }
+    .section-sub { text-align: center; color: var(--text-dim); font-size: 14.5px; margin: 0 0 30px; }
+
+    .principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px; }
+    .p {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 24px; font-size: 14px; color: var(--text-dim);
+    }
+    .p .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--cyan); margin-bottom: 6px; }
+    .p h4 { margin: 0 0 6px; font-size: 15.5px; color: var(--text); }
+
+    footer { text-align: center; padding: 48px 20px 40px; color: #64748b; font-size: 13px; }
+
+    @media (max-width: 760px) {
+      header h1 { font-size: 32px; }
+      .container { padding: 0 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <header>
+    <h1>AI 落地实例集</h1>
+    <p>四个独立站点、18 个已完成板块 —— 从跨境投放到个人效率，每一个都在日常工作里真实跑着，不是为展示做的一次性 demo</p>
+    <p class="sub2">全部由我独立设计、开发与维护 · 数据已在展示中做必要脱敏</p>
+  </header>
+
+  <div class="container">
+
+    <div class="stats">
+      <div class="stat"><b>4</b><span>作品集站点</span></div>
+      <div class="stat"><b>18</b><span>已完成板块</span></div>
+      <div class="stat"><b>5</b><span>独立部署的线上应用</span></div>
+      <div class="stat"><b>日常在用</b><span>非一次性演示</span></div>
+    </div>
+
+    <div class="sites">
+
+      <article class="site">
+        <div class="site-top">
+          <div class="num">01</div>
+          <div>
+            <h2>跨境投放自动化</h2>
+            <div class="note-line">投放数据流 · 素材库 · 达人库</div>
+          </div>
+        </div>
+        <p class="desc">把 TikTok 投放里最耗人的手工活全部接管：数据汇总播报、账户余额预警、素材脚本读取、链接补全、达人群入库。</p>
+        <div class="why"><b>解决什么：</b>日报周报靠手抄、素材台账靠人填 —— 五个实例把这部分人力归零，数字逐行可追溯到底表。</div>
+        <div class="chips">
+          <span class="chip">01 GMV Max 数据流</span>
+          <span class="chip">02 账户余额监控</span>
+          <span class="chip">03 创意脚本读取</span>
+          <span class="chip">04 TK 链接自动补全</span>
+          <span class="chip">05 达人库批量入库</span>
+        </div>
+        <a class="go" href="https://bbhutu.github.io/gmvmax-flow/" target="_blank">进入站点 → <small>gmvmax-flow</small></a>
+      </article>
+
+      <article class="site">
+        <div class="site-top">
+          <div class="num">02</div>
+          <div>
+            <h2>市场洞察报告</h2>
+            <div class="note-line">类目调研 · 可复用流程</div>
+          </div>
+        </div>
+        <p class="desc">把榜单数据做成可执行的市场判断：三国 × 两类目逐月分析，同一套流程可复用到任意市场、类目与时间维度。</p>
+        <div class="why"><b>解决什么：</b>看榜单只看得到排名，看不到格局 —— 报告回答「销量集中在哪、机会在哪、怎么进」。</div>
+        <div class="chips">
+          <span class="chip">01 报告全貌</span>
+          <span class="chip">02 分析方法</span>
+          <span class="chip">03 可复用流程</span>
+          <span class="chip extra">已产出六份成套报告</span>
+        </div>
+        <a class="go" href="https://bbhutu.github.io/market-insight-reports/" target="_blank">进入站点 → <small>market-insight-reports</small></a>
+      </article>
+
+      <article class="site">
+        <div class="site-top">
+          <div class="num">03</div>
+          <div>
+            <h2>演讲练习工具</h2>
+            <div class="note-line">可交互 · 有线上 Demo</div>
+          </div>
+        </div>
+        <p class="desc">从 unprompted.cool 复刻并中文化的即兴演讲练习器：抽题、计时、语音转写、五维评分、诊断报告、洗稿，单文件网页零依赖。</p>
+        <div class="why"><b>解决什么：</b>即兴表达练完没人给反馈 —— 工具把「练 → 评 → 改」合成一条闭环，可直接在浏览器里玩。</div>
+        <div class="chips">
+          <span class="chip">01 计时与录音</span>
+          <span class="chip">02 诊断报告</span>
+          <span class="chip">03 评分与数据</span>
+          <span class="chip">04 洗稿</span>
+          <span class="chip extra">附线上可玩 Demo</span>
+        </div>
+        <a class="go" href="https://bbhutu.github.io/speaking-portfolio/" target="_blank">进入站点 → <small>speaking-portfolio</small></a>
+        <a class="go" style="margin-top:10px;background:rgba(251,191,36,.10);border-color:rgba(251,191,36,.32)" href="https://bbhutu.github.io/unprompted-trainer/" target="_blank">直接试用 Demo → <small>unprompted-trainer</small></a>
+      </article>
+
+      <article class="site">
+        <div class="site-top">
+          <div class="num">04</div>
+          <div>
+            <h2>个人效率系统</h2>
+            <div class="note-line">飞书多维表 · iOS 快捷指令 · Windows 原生挂件</div>
+          </div>
+        </div>
+        <p class="desc">一套跑在日常里的闭环：手机上一笔 10 秒记完，落进同一个多维表，桌面挂件可读写，消费日报与黄金日报定时推送。</p>
+        <div class="why"><b>解决什么：</b>工具很多但各存各的数据 —— 这里手机、桌面、播报读写的是同一份底表，没有二次录入。</div>
+        <div class="chips">
+          <span class="chip">01 移动入口</span>
+          <span class="chip">02 四个表单</span>
+          <span class="chip">03 开销多维表</span>
+          <span class="chip">04 子弹时间</span>
+          <span class="chip">05 黄金播报</span>
+          <span class="chip">06 设计原则</span>
+        </div>
+        <a class="go" href="https://bbhutu.github.io/personal-efficiency-system/" target="_blank">进入站点 → <small>personal-efficiency-system</small></a>
+      </article>
+
+    </div>
+
+    <h3 class="section-title">贯穿四个站点的方法</h3>
+    <p class="section-sub">技术细节会过时，这几条不会 —— 也是我做每一个实例时的判断依据</p>
+
+    <div class="principles">
+      <div class="p">
+        <span class="tag">口径先行</span>
+        <h4>先定口径，再谈图表</h4>
+        支出、收入、投资三分类在表单端就收窄；投资不算支出、大额按月摊销 —— 口径不对，记录越多越误导。
+      </div>
+      <div class="p">
+        <span class="tag">数据同源</span>
+        <h4>一个底表，多条链路</h4>
+        手机表单、桌面挂件、定时播报读写同一份数据；播报里的每个数字都能回到底表逐行核对。
+      </div>
+      <div class="p">
+        <span class="tag">自动化优先</span>
+        <h4>能定时跑的，不手工做</h4>
+        开机自启动、每晚推送、交易日自动取数 —— 系统自己跑起来，才不会三天热度后荒废。
+      </div>
+      <div class="p">
+        <span class="tag">说人话</span>
+        <h4>术语当场科普</h4>
+        日报与报告里出现专业名词，就附一句大白话解释：是什么、跟结论有什么关系。看不懂的词不留在页面上。
+      </div>
+    </div>
+
+  </div>
+
+  <footer>AI 落地实例集 · 四个站点 · 全部独立开发并持续维护</footer>
+</body>
+</html>
