@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 自动化实例集 · 产品协同工作台</title>
+<style>
+    :root {
+      --bg: #030712;
+      --bg-card: rgba(17, 24, 39, 0.7);
+      --border: rgba(56, 189, 248, 0.2);
+      --cyan: #22d3ee;
+      --blue: #3b82f6;
+      --violet: #8b5cf6;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --text: #f3f4f6;
+      --text-dim: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden;
+    }
+    .bg-grid {
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(34,211,238,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,.05) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(circle at 50% 0%, black, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at 50% 0%, black, transparent 80%);
+      z-index: -2; pointer-events: none;
+    }
+    .bg-glow {
+      position: fixed; width: 600px; height: 600px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(34,211,238,.18), transparent 60%);
+      top: -200px; left: 50%; transform: translateX(-50%);
+      z-index: -1; filter: blur(60px); pointer-events: none;
+    }
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin: 22px 24px 0; padding: 7px 14px; border-radius: 999px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-dim); text-decoration: none; font-size: 13px; transition: all .25s ease;
+    }
+    .back-link:hover { color: var(--text); border-color: var(--cyan); }
+    header { text-align: center; padding: 36px 20px 24px; }
+    .eyebrow { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: var(--cyan); margin-bottom: 12px; }
+    header h1 {
+      font-size: 42px; font-weight: 800; margin: 0 0 12px;
+      background: linear-gradient(135deg, var(--cyan), var(--blue), var(--violet));
+      -webkit-background-clip: text; background-clip: text; color: transparent; letter-spacing: -1px;
+    }
+    header p { font-size: 17px; color: var(--text-dim); margin: 0 auto; max-width: 700px; }
+    .stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin: 28px auto 8px; padding: 0 20px; }
+    .stat { text-align: center; }
+    .stat b {
+      display: block; font-size: 26px; font-weight: 800; line-height: 1.2;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .stat span { font-size: 12px; color: var(--text-dim); letter-spacing: .5px; }
+    .toc { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; padding: 8px 24px 4px; }
+    .toc a {
+      display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: 999px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-dim); text-decoration: none; font-size: 13px; transition: all .25s ease;
+    }
+    .toc a:hover { color: var(--text); border-color: var(--cyan); box-shadow: 0 0 18px rgba(34,211,238,.18); transform: translateY(-2px); }
+    .toc a b { font-size: 11px; color: var(--cyan); font-weight: 700; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 20px 24px 80px; }
+    .case { margin-bottom: 82px; scroll-margin-top: 24px; }
+    .case-head { text-align: center; margin-bottom: 30px; }
+    .case-index {
+      display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+      padding: 6px 14px; border-radius: 999px; background: rgba(34,211,238,.1);
+      border: 1px solid rgba(34,211,238,.3); color: var(--cyan); margin-bottom: 14px;
+    }
+    .case-head h2 { font-size: 30px; font-weight: 800; margin: 0 0 8px; letter-spacing: -.5px; }
+    .case-head p { color: var(--text-dim); margin: 0 auto; max-width: 720px; font-size: 15px; }
+    .tags { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .tag { font-size: 11px; padding: 4px 11px; border-radius: 999px; background: rgba(139,92,246,.1); border: 1px solid rgba(139,92,246,.3); color: #c4b5fd; }
+    .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 30px; }
+    .flow-step {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 18px 14px; text-align: center; position: relative;
+    }
+    .flow-step:not(:last-child)::after {
+      content: '→'; position: absolute; right: -14px; top: 50%; transform: translateY(-50%);
+      color: var(--cyan); font-size: 18px; z-index: 2;
+    }
+    .flow-icon { font-size: 26px; margin-bottom: 8px; }
+    .flow-step b { display: block; font-size: 14px; margin-bottom: 4px; color: var(--text); }
+    .flow-step span { font-size: 12px; color: var(--text-dim); line-height: 1.5; display: block; }
+    .block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 26px; margin-bottom: 18px; }
+    .block-num { font-size: 12px; font-weight: 700; color: var(--cyan); letter-spacing: 1px; }
+    .block h3 { font-size: 19px; margin: 4px 0 14px; font-weight: 700; }
+    .block ul { margin: 0; padding-left: 20px; }
+    .block li { margin-bottom: 9px; color: var(--text-dim); font-size: 14.5px; }
+    .block li b { color: var(--text); font-weight: 600; }
+    .status {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 16px;
+      font-size: 11px; padding: 5px 12px; border-radius: 999px;
+      background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.3); color: #6ee7b7;
+    }
+    .status::before { content: '●'; font-size: 8px; }
+    .status.warn { background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.3); color: #fcd34d; }
+    .subcase { margin: 34px 0 18px; padding-left: 16px; border-left: 3px solid var(--violet); }
+    .subcase .sn { font-size: 11px; color: #c4b5fd; font-weight: 700; letter-spacing: 1px; }
+    .subcase h3 { font-size: 20px; margin: 4px 0 6px; }
+    .subcase > p { margin: 0; color: var(--text-dim); font-size: 14px; }
+    .shot {
+      margin-top: 18px; border: 1px dashed rgba(148,163,184,.35); border-radius: 12px;
+      padding: 26px 20px; text-align: center; background: rgba(148,163,184,.04);
+    }
+    .shot-icon { font-size: 28px; opacity: .5; margin-bottom: 6px; }
+    .shot b { display: block; font-size: 13px; color: var(--text-dim); font-weight: 600; }
+    .shot span { font-size: 11px; color: #64748b; }
+    .shot-img {
+      margin: 18px 0 0; border: 1px solid rgba(56,189,248,.22); border-radius: 12px;
+      overflow: hidden; background: rgba(3,7,18,.6);
+    }
+    .shot-img img { display: block; width: 100%; height: auto; }
+    .shot-img figcaption {
+      padding: 10px 14px; font-size: 12px; color: var(--text-dim);
+      border-top: 1px solid rgba(56,189,248,.14); background: rgba(17,24,39,.85);
+    }
+    .shot-img figcaption b { color: #a5f3fc; font-weight: 600; }
+    .diagram {
+      margin-top: 18px; padding: 20px; border-radius: 12px;
+      background: rgba(3,7,18,.6); border: 1px solid rgba(56,189,248,.15);
+    }
+    .diagram-title { font-size: 11px; color: var(--cyan); letter-spacing: 1px; margin-bottom: 14px; font-weight: 700; }
+    .diagram-flow { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .dn { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; background: rgba(34,211,238,.08); border: 1px solid rgba(34,211,238,.3); color: #a5f3fc; }
+    .dn.v { background: rgba(139,92,246,.08); border-color: rgba(139,92,246,.3); color: #ddd6fe; }
+    .dn.g { background: rgba(16,185,129,.08); border-color: rgba(16,185,129,.3); color: #a7f3d0; }
+    .dn.a { background: rgba(245,158,11,.08); border-color: rgba(245,158,11,.3); color: #fde68a; }
+    .da { color: var(--text-dim); font-size: 14px; }
+    .note {
+      margin-top: 14px; padding: 12px 16px; border-left: 3px solid var(--violet);
+      background: rgba(139,92,246,.06); border-radius: 0 8px 8px 0; font-size: 13px; color: var(--text-dim);
+    }
+    .note b { color: #c4b5fd; }
+    .method { margin-top: 70px; padding-top: 40px; border-top: 1px solid var(--border); }
+    .method h2 { text-align: center; font-size: 24px; margin-bottom: 8px; }
+    .method > p { text-align: center; color: var(--text-dim); font-size: 14px; margin-bottom: 26px; }
+    .method-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .principle { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; }
+    .principle b { font-size: 16px; color: var(--cyan); }
+    .principle em { display: block; font-style: normal; font-size: 14px; font-weight: 600; margin: 4px 0 8px; }
+    .principle p { margin: 0; font-size: 13px; color: var(--text-dim); }
+    .footer { text-align: center; padding: 40px 20px 60px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: 13px; }
+    .footer b { color: var(--text); }
+    @media (max-width: 760px) {
+      header h1 { font-size: 32px; }
+      .flow { grid-template-columns: repeat(2, 1fr); }
+      .flow-step:not(:last-child)::after { display: none; }
+      .method-grid { grid-template-columns: 1fr; }
+      .stats { gap: 22px; }
+    }
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-glow"></div>
+
+<a class="back-link" href="https://bbhutu.github.io/">← 全部作品集</a>
+
+<header>
+  <div class="eyebrow">AI 自动化实例集 · 产品协同工作台</div>
+  <h1>产品协同工作台</h1>
+  <p>把投放团队散在多张表里的信息收进同一个页面 —— 产品链接、时间节点、素材方向、发布与拒审、达人话术，四个模块各自成体系，又共用同一份底表和同一套权限。</p>
+  <div class="stats">
+    <div class="stat"><b>4</b><span>功能模块</span></div>
+    <div class="stat"><b>6</b><span>数据维度</span></div>
+    <div class="stat"><b>4</b><span>素材能力</span></div>
+    <div class="stat"><b>1</b><span>协同入口</span></div>
+  </div>
+</header>
+
+<nav class="toc">
+  <a href="#collab"><b>01</b>产品信息协同</a>
+  <a href="#milestones"><b>02</b>重大时间节点</a>
+  <a href="#material"><b>03</b>素材管理库</a>
+  <a href="#bd"><b>04</b>达人BD流程</a>
+</nav>
+
+<div class="container">
+
+  <!-- 01 产品信息协同 -->
+  <section class="case" id="collab">
+    <div class="case-head">
+      <div class="case-index">模块 01</div>
+      <h2>产品信息协同</h2>
+      <p>多链接、多信息源汇总到一处 —— 飞书《产品协同表》与《达人库》两张底表同步进来，六个数据维度一屏总览，点开还能按产品拆开看。</p>
+      <div class="tags"><span class="tag">双表汇聚</span><span class="tag">六维总览</span><span class="tag">单元格直改</span></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-icon">📄</div><b>产品协同表</b><span>链接 / 定价 / 状态</span></div>
+      <div class="flow-step"><div class="flow-icon">👥</div><b>达人库</b><span>触达 / 寄样 / 视频</span></div>
+      <div class="flow-step"><div class="flow-icon">🔀</div><b>按产品归集</b><span>同产品多链接合并</span></div>
+      <div class="flow-step"><div class="flow-icon">📊</div><b>总览与明细</b><span>六张卡点开下钻</span></div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">01</div>
+      <h3>实现了什么功能</h3>
+      <ul>
+        <li><b>六维统计总览：</b>在投链接数、覆盖产品数、达人触达总量、达人寄样总量、已完成达人数、已返回视频总数，一屏摆齐。</li>
+        <li><b>点开看明细：</b>触达、寄样、完成达人、返回视频四张卡可展开，按产品逐个看数量，合计与分产品明细对得上。</li>
+        <li><b>多条件筛选：</b>按国家、产品、投放状态、负责人、定价区间筛，支持关键词搜索链接 ID / 产品 / 定价 / 负责人。</li>
+        <li><b>两种视图：</b>平铺表格与「按产品分组」切换，在投状态自动置顶。</li>
+        <li><b>直接编辑：</b>点单元格就地改，改动实时落库；支持列设置、新增链接、导出 CSV / JSON、导入 JSON。</li>
+      </ul>
+      <div class="diagram">
+        <div class="diagram-title">两张飞书表 → 六个数据维度</div>
+        <div class="diagram-flow">
+          <span class="dn">产品协同表</span><span class="da">＋</span><span class="dn v">达人库</span><span class="da">→</span>
+          <span class="dn g">在投 · 产品 · 触达 · 寄样 · 完成 · 视频</span>
+        </div>
+      </div>
+      <div class="status">已上线 · 团队日常在用</div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">02</div>
+      <h3>怎么实现 / 原理</h3>
+      <ul>
+        <li><b>双表汇聚：</b>产品链接信息与达人数据分别来自两张飞书多维表，页面按产品归属把同产品的多条达人链接合并统计。</li>
+        <li><b>去重口径：</b>同一产品内按产品去重，避免多条链接重复累加；达人可跨产品，合计按各产品直接相加，不去重。</li>
+        <li><b>逐项标注口径：</b>每张统计卡都挂了口径说明，鼠标悬停就能看到「这个数是怎么算出来的」。</li>
+        <li><b>双向同步：</b>网页改动先落云端协同表，再以哈希基线判断方向写回飞书；飞书改了则拉回云端。</li>
+      </ul>
+      <div class="note"><b>关键设计：</b>云端加载完成前禁止写入。早期没有这道闸门，浏览器里的旧快照被当成新增行灌进云端，造成重复数据 —— 现在启动竞态已彻底堵住。</div>
+      <figure class="shot-img"><img src="assets/01-collab-main.png" alt="产品协同表主界面：六维统计卡、筛选栏与产品链接明细表"><figcaption><b>界面实拍 · 链接ID已打码 · 产品协同表主界面</b> — 六张统计卡、按产品下钻、筛选栏与可直改的明细表</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 02 重大时间节点 -->
+  <section class="case" id="milestones">
+    <div class="case-head">
+      <div class="case-index">模块 02</div>
+      <h2>重大时间节点</h2>
+      <p>按产品、按事项记录时间线 —— 物流到仓、达人触达等节点从文字里自动解析日期，自动判定状态，自动把近期要盯的事挑出来。</p>
+      <div class="tags"><span class="tag">三级时间线</span><span class="tag">自动解析日期</span><span class="tag">近期需关注</span></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-icon">📦</div><b>按产品分组</b><span>每个产品独立时间线</span></div>
+      <div class="flow-step"><div class="flow-icon">🧾</div><b>事件下挂节点</b><span>一事一条时间线</span></div>
+      <div class="flow-step"><div class="flow-icon">📅</div><b>自动读日期</b><span>从文字里提取时间</span></div>
+      <div class="flow-step"><div class="flow-icon">⏰</div><b>近期需关注</b><span>自动排出待办</span></div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">01</div>
+      <h3>实现了什么功能</h3>
+      <ul>
+        <li><b>三级结构：</b>产品 → 事件 → 时间线节点。每个产品下可以有多个事项，每个事项持续追加更新，形成完整过程记录。</li>
+        <li><b>灵活记日期：</b>写「10/12」或「10月底」「10月中」都能识别，不用先格式化日期。</li>
+        <li><b>自动状态：</b>每条事项自动显示「已完成 / 进行中 / 待安排 / 已过 N 天 / 今天到期 / N 天后」。</li>
+        <li><b>近期需关注：</b>页面顶部自动列出未来 30 天内到期、以及已过期还没确认的事，按紧急程度排序、分级标色。</li>
+        <li><b>随手维护：</b>新增产品、新增事件、追加更新、删除节点都在页面上完成，改动实时生效。</li>
+      </ul>
+      <div class="diagram">
+        <div class="diagram-title">从一句文字到一个提醒</div>
+        <div class="diagram-flow">
+          <span class="dn">节点文字</span><span class="da">→</span><span class="dn v">解析日期</span><span class="da">→</span>
+          <span class="dn g">算距今天数</span><span class="da">→</span><span class="dn a">自动判定状态并排序</span>
+        </div>
+      </div>
+      <div class="status">已上线 · 自动计算提醒</div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">02</div>
+      <h3>怎么实现 / 原理</h3>
+      <ul>
+        <li><b>文本日期解析：</b>用正则从节点文字里抓出日期表达式，把「月底 / 末 / 中 / 初」换算成具体日子，再取最晚的一个作为事项目标日。</li>
+        <li><b>状态规则：</b>文字里带完成标记就判已完成；带「持续 / 进行中」就不催；带「待定 / 暂无」就归待安排；其余按目标日与今天的差值判逾期、今天、几天后。</li>
+        <li><b>提醒窗口：</b>只把「已过一段但没确认」到「未来 30 天内」的事捞进提醒区，太久以前和太远的都不打扰。</li>
+        <li><b>数据存储：</b>节点存在云端 milestones 表，页面读不到时由服务端代读兜底，保证所有人看到同一份时间线。</li>
+      </ul>
+      <div class="note"><b>说明：</b>这里的「自动」是页面自动计算并高亮提醒，不额外向飞书群推送消息 —— 打开页面就能看到该盯什么。</div>
+      <figure class="shot-img"><img src="assets/02-milestones.jpg" alt="时间节点页面：顶部近期需关注提醒条与按产品分组的事件时间线"><figcaption><b>界面实拍 · 链接ID已打码 · 时间节点与近期需关注</b> — 顶部自动排出的待办提醒，下方按产品展开的事件时间线</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 03 素材管理库（重点） -->
+  <section class="case" id="material">
+    <div class="case-head">
+      <div class="case-index">模块 03 · 重点</div>
+      <h2>素材管理库</h2>
+      <p>团队所有产品的内容信息整合到一处 —— 发布账号、发布内容、素材方向、拒审监控四块连成一条线，从「谁在发」到「发得怎么样」一页看清。</p>
+      <div class="tags"><span class="tag">业务指挥中心</span><span class="tag">四块能力</span><span class="tag">可视化统计</span></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-icon">📮</div><b>发布账号</b><span>各产品的号统一管理</span></div>
+      <div class="flow-step"><div class="flow-icon">📊</div><b>发布内容</b><span>发多少、发什么方向</span></div>
+      <div class="flow-step"><div class="flow-icon">📋</div><b>素材方向</b><span>方向关键词统一口径</span></div>
+      <div class="flow-step"><div class="flow-icon">🚫</div><b>拒审监控</b><span>按方向看拒审率</span></div>
+    </div>
+
+    <div class="subcase">
+      <div class="sn">能力 01</div>
+      <h3>投放产品的账号管理</h3>
+      <p>每个产品对应哪些 TikTok 发布账号，集中登记、一点直达。</p>
+    </div>
+    <div class="block">
+      <ul>
+        <li><b>按产品归组：</b>账号按所属产品分组展示，哪个产品有哪些号一眼清楚。</li>
+        <li><b>一点开主页：</b>账号名就是链接，点开直接跳到对应 TikTok 主页，不用再去表里复制。</li>
+        <li><b>达人号标记：</b>名字里含「达人」的账号自动打标，和自有发布号区分开。</li>
+        <li><b>增删改：</b>新增账号填产品、主页链接、昵称即可，链接里的 @账号名自动识别；编辑和删除都在页面上完成。</li>
+      </ul>
+      <div class="note"><b>解决什么：</b>以前账号散在各人手里，换人接手就得挨个问；现在账号清单和素材方向共用一套产品分类，新增品类时两边都能立即立卡。</div>
+    </div>
+
+    <div class="subcase">
+      <div class="sn">能力 02</div>
+      <h3>发布内容管理</h3>
+      <p>发了多少、哪个产品在发、发的是哪个方向，按任意时间区间看。</p>
+    </div>
+    <div class="block">
+      <ul>
+        <li><b>发布量总览：</b>本周发布、今日发布、日均三个数摆在最上面，产品分布用胶囊展示占比。</li>
+        <li><b>八种区间：</b>今日 / 本周 / 上周 / 本月 / 上月 / 近 7 天 / 近 30 天 / 自定义，随手切换。</li>
+        <li><b>北京时间口径：</b>统计按北京时间算，避免时区误判成「数据没更新」。</li>
+        <li><b>源表覆盖提示：</b>把发布源表和制作源表各自覆盖的时间段摆出来，防止拿老数据当新数据看。</li>
+        <li><b>区间明细：</b>按方向列出发布条数、占总发布比、拒审数、拒审率，还能按产品筛选只看某一类目。</li>
+      </ul>
+      <figure class="shot-img"><img src="assets/03-publish-overview.png" alt="发布数据总览：发布量 KPI、产品占比胶囊与区间切换条"><figcaption><b>界面实拍 · 链接ID已打码 · 发布数据总览</b> — 发布量 KPI、产品占比、时间区间切换与区间发布明细</figcaption></figure>
+    </div>
+
+    <div class="subcase">
+      <div class="sn">能力 03</div>
+      <h3>各产品素材方向管理</h3>
+      <p>每周方向统一口径 —— 素材命名必须带方向关键词，后面的产出、发布、储备都按它统计。</p>
+    </div>
+    <div class="block">
+      <ul>
+        <li><b>按产品分卡：</b>每个产品一张方向卡，卡内列出该产品的全部素材方向。</li>
+        <li><b>方向全字段：</b>开始制作时间、方向名、关键词、参考链接、视频框架、当前状态、制作条数、发布条数。</li>
+        <li><b>状态两态：</b>只保留「测试中 / 已暂停」，测试中自动置顶，点状态就能来回切。</li>
+        <li><b>关键词即口径：</b>点关键词可一键复制，编导命名时带上它，产出和发布就能自动归到这个方向。</li>
+        <li><b>参考链接与框架：</b>参考视频链接可直接打开，视频框架可收起让方向一览更清爽。</li>
+        <li><b>统计不断档：</b>方向停掉制作后改按滚发统计，不会因为没有新产出就显示零。</li>
+      </ul>
+      <div class="diagram">
+        <div class="diagram-title">一个关键词串起全链路</div>
+        <div class="diagram-flow">
+          <span class="dn">定方向关键词</span><span class="da">→</span><span class="dn v">命名带关键词</span><span class="da">→</span>
+          <span class="dn g">统计产出</span><span class="da">→</span><span class="dn a">统计发布与储备</span>
+        </div>
+      </div>
+      <figure class="shot-img"><img src="assets/04-direction-detail.png" alt="每周方向细览：按产品分卡的方向表，含关键词、状态、制作与发布条数"><figcaption><b>界面实拍 · 链接ID已打码 · 每周方向细览</b> — 方向关键词、参考链接、视频框架、测试中状态与制作/发布条数</figcaption></figure>
+    </div>
+
+    <div class="subcase">
+      <div class="sn">能力 04</div>
+      <h3>素材拒审的监控管理</h3>
+      <p>每个方向的拒审数和拒审率直接摆在发布明细里，问题方向一眼挑出来。</p>
+    </div>
+    <div class="block">
+      <ul>
+        <li><b>逐方向拒审：</b>区间明细里每个素材方向都列出拒审条数和拒审率。</li>
+        <li><b>分级预警：</b>拒审率超过一半标红、接近三分之一标黄，扫一眼就知道哪里出问题。</li>
+        <li><b>口径写清楚：</b>拒审只算投放后台的「不合适 + 下架」，探索中不算；拒审率 = 该方向拒审 ÷ 该方向发布。</li>
+        <li><b>未归口单列：</b>没命中任何方向关键词的发布条数单独列一行，避免这部分被漏掉。</li>
+        <li><b>占比统一分母：</b>各方向占比都按区间总发布数算，能直接看出每个方向吃掉多少盘子。</li>
+      </ul>
+      <div class="note"><b>解决什么：</b>以前拒审是个笼统数字，不知道是哪个方向的问题；现在能定位到具体方向，改方向或换素材就有依据。</div>
+      <figure class="shot-img"><img src="assets/05-reject-rate.png" alt="区间发布明细与拒审率：按方向列出发布条数、占比、拒审数与拒审率"><figcaption><b>界面实拍 · 链接ID已打码 · 区间发布明细与拒审率</b> — 每个方向的发布占比条、拒审数与分级预警的拒审率</figcaption></figure>
+    </div>
+
+    <div class="block">
+      <div class="block-num">05</div>
+      <h3>整体是怎么实现的</h3>
+      <ul>
+        <li><b>一份方向主数据：</b>素材方向存在云端 material_directions 表，发布账号存在 pub_accounts 表，所有人编辑同一份。</li>
+        <li><b>两张源表供数：</b>发布数据来自「西语发布表」，制作数据来自制作源表，服务端按关键词匹配方向并汇总。</li>
+        <li><b>三层兜底：</b>访客可直读云端；读不到时走服务端代理；服务端再失败就显示明确提示，不拿空数据糊弄。</li>
+        <li><b>口径优先于图表：</b>先把「什么算发布、什么算拒审、按哪天归区间」定死，再出数字，避免看起来热闹但对不上账。</li>
+      </ul>
+      <div class="status">已上线 · 四块能力联动</div>
+    </div>
+  </section>
+
+  <!-- 04 达人BD流程 -->
+  <section class="case" id="bd">
+    <div class="case-head">
+      <div class="case-index">模块 04</div>
+      <h2>达人BD流程</h2>
+      <p>把达人沟通话术按负责人、轮次、环节、步骤排成一条线 —— 每个人一套自己的话术库，贴达人回复还能让 AI 按团队风格生成接法。</p>
+      <div class="tags"><span class="tag">负责人分库</span><span class="tag">轮次步骤</span><span class="tag">AI 回复</span></div>
+    </div>
+    <div class="flow">
+      <div class="flow-step"><div class="flow-icon">👤</div><b>选负责人</b><span>每人一套互不影响</span></div>
+      <div class="flow-step"><div class="flow-icon">🔁</div><b>选轮次</b><span>一轮 / 二轮 / 二邀</span></div>
+      <div class="flow-step"><div class="flow-icon">🧩</div><b>看环节</b><span>按沟通阶段筛选</span></div>
+      <div class="flow-step"><div class="flow-icon">💬</div><b>按步骤用话术</b><span>第 N 步一目了然</span></div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">01</div>
+      <h3>实现了什么功能</h3>
+      <ul>
+        <li><b>负责人分库：</b>先选负责人，只看这个人的话术；每人一套，互不干扰，都能直接编辑。</li>
+        <li><b>轮次管理：</b>一轮（沟通一轮就寄样）、二轮（先定真人出镜再寄样）、优质达人二邀、通用，轮次顺序可自定义。</li>
+        <li><b>步骤化展示：</b>每条话术标「第 N 步」，一步一排、横向滑动；支持「按步骤合并」和「按环节分线」两种视图。</li>
+        <li><b>缺项提示：</b>自动统计当前范围里缺英文的话术条数，避免对外沟通时才发现没准备好。</li>
+        <li><b>AI 回复：</b>把达人回复贴进来，按团队自己的话术风格生成接法，不用现想。</li>
+        <li><b>搜索与排序：</b>按关键词搜话术或环节，整组步骤可上下对调，环节可自由新建。</li>
+      </ul>
+      <div class="status">已上线 · 所有人可编辑</div>
+    </div>
+
+    <div class="block">
+      <div class="block-num">02</div>
+      <h3>怎么实现 / 原理</h3>
+      <ul>
+        <li><b>四维筛选：</b>负责人是主维度，轮次、环节、关键词依次收窄，所有统计跟着当前范围走。</li>
+        <li><b>步骤分组：</b>连续的同一步话术并成一排，步骤号相同时按环节再分组，形成可横向滑动的话术带。</li>
+        <li><b>三语结构：</b>每条话术含中文、英文与说明，缺英文的单独统计提示。</li>
+        <li><b>云端单一来源：</b>话术与轮次顺序都存在云端，页面改动实时生效，所有人刷新即见最新版。</li>
+      </ul>
+      <figure class="shot-img"><img src="assets/06-bd-scripts.png" alt="达人 BD 话术流程：负责人与轮次筛选、按步骤排列的三语话术卡片"><figcaption><b>界面实拍 · 链接ID已打码 · 达人 BD 话术流程</b> — 负责人/轮次筛选，按第 N 步排列的中英西三语话术卡</figcaption></figure>
+    </div>
+  </section>
+
+  <!-- 方法论 -->
+  <section class="method">
+    <h2>贯穿这个项目的方法</h2>
+    <p>技术细节会过时，这几条不会 —— 也是做每一个模块时的判断依据</p>
+    <div class="method-grid">
+      <div class="principle"><b>口径先行</b><em>先定口径，再谈图表</em><p>什么算发布、什么算拒审、达人怎么去重，都先把算法定死再看数字，避免表很好看但对不上账。</p></div>
+      <div class="principle"><b>数据同源</b><em>一个底表，多条链路</em><p>四个模块读写的是同一套云端表，产品分类一致，账号清单和素材方向能互相补位。</p></div>
+      <div class="principle"><b>自动化优先</b><em>能自动算的，不手工盯</em><p>日期解析、状态判定、拒审率、按方向汇总都交给系统，人只做判断和决策。</p></div>
+      <div class="principle"><b>严格验证</b><em>不拿接口冒充页面</em><p>功能是否可用必须在真实浏览器看渲染和编辑；数据结论必须逐行核对底表。</p></div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  <b>AI 自动化实例集 · 产品协同工作台</b> · 独立开发并持续维护 · 仅链接ID已打码，其余数据如实呈现 · 摄于 2026-11-25
+</div>
+
+</body>
+</html>
